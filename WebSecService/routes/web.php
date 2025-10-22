@@ -68,3 +68,8 @@ Route::get('/products', function () {
 
     return view('products', compact('products'));
 });
+
+
+Route::get('/calculator', function () {
+    return view('calculator');
+});
