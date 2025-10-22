@@ -73,3 +73,14 @@ Route::get('/products', function () {
 Route::get('/calculator', function () {
     return view('calculator');
 });
+
+
+Route::get('/gpa', function () {
+    $courses = [
+        ['code' => 'CS101', 'title' => 'Intro to Programming', 'credit_hours' => 3],
+        ['code' => 'CS202', 'title' => 'Data Structures', 'credit_hours' => 4],
+        ['code' => 'MATH201', 'title' => 'Calculus II', 'credit_hours' => 3],
+        ['code' => 'ENG101', 'title' => 'English Composition', 'credit_hours' => 2],
+    ];
+    return view('gpa', compact('courses'));
+});
