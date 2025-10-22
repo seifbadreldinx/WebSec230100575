@@ -20,3 +20,19 @@ Route::get('/minitest', function () {
 
     return view('minitest', compact('bill'));
 });
+
+
+Route::get('/transcript', function () {
+    $student = [
+        'name' => 'Seif Badreldin',
+        'id' => '230100575',
+        'program' => 'Network & Cyber Security',
+        'courses' => [
+            ['name' => 'Network Fundamentals', 'grade' => 'A'],
+            ['name' => 'Operating Systems', 'grade' => 'B+'],
+            ['name' => 'Cybersecurity Basics', 'grade' => 'A-'],
+            ['name' => 'Web Security', 'grade' => 'A'],
+        ],
+    ];
+    return view('transcript', compact('student'));
+});
