@@ -255,10 +255,23 @@
                         
                         @if(auth()->check() && auth()->user()->isCustomer())
                             @if($product->stock > 0)
-                                <form action="{{ route('products.buy', $product->id) }}" method="POST">
+                                <form action="{{ route('products.buy', $product->id) }}" method="POST" style="margin-top: 10px;">
                                     @csrf
-                                    <input type="hidden" name="quantity" value="1">
-                                    <button type="submit" class="btn btn-primary">
+                                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                        <label for="quantity_{{ $product->id }}" style="font-weight: 600; margin: 0;">Qty:</label>
+                                        <input 
+                                            type="number" 
+                                            id="quantity_{{ $product->id }}"
+                                            name="quantity" 
+                                            value="1" 
+                                            min="1" 
+                                            max="{{ $product->stock }}"
+                                            required
+                                            style="width: 70px; padding: 5px; border: 2px solid #667eea; border-radius: 5px; font-size: 14px;"
+                                        >
+                                        <span style="color: #666; font-size: 13px;">(Max: {{ $product->stock }})</span>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" style="width: 100%;">
                                         🛒 Buy Now
                                     </button>
                                 </form>
