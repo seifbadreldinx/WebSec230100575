@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Product - Employee</title>
+    <title>Edit Product - Employee</title>
     <style>
         * {
             margin: 0;
@@ -168,14 +168,13 @@
         </div>
         <div class="navbar-links">
             <div class="user-info">
-                👤 <?php echo e(auth()->user()->name); ?>
-
+                👤 {{ auth()->user()->name }}
             </div>
-            <a href="<?php echo e(route('employee.dashboard')); ?>">Dashboard</a>
-            <a href="<?php echo e(route('employee.customers')); ?>">Customers</a>
-            <a href="<?php echo e(route('employee.products')); ?>">Products</a>
-            <form action="<?php echo e(route('logout')); ?>" method="POST">
-                <?php echo csrf_field(); ?>
+            <a href="{{ route('admin.dashboard') }}">Dashboard</a>
+            <a href="{{ route('admin.customers') }}">Customers</a>
+            <a href="{{ route('admin.products') }}">Products</a>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
                 <button type="submit">Logout</button>
             </form>
         </div>
@@ -184,22 +183,23 @@
     <div class="container">
         <div class="form-container">
             <div class="form-header">
-                <h2>➕ Create New Product</h2>
-                <a href="<?php echo e(route('employee.products')); ?>" style="color: #28a745; text-decoration: none;">← Back to Products</a>
+                <h2>✏️ Edit Product</h2>
+                <a href="{{ route('admin.products') }}" style="color: #28a745; text-decoration: none;">← Back to Products</a>
             </div>
 
-            <?php if($errors->any()): ?>
+            @if($errors->any())
                 <div class="alert alert-danger">
                     <ul style="margin-left: 20px;">
-                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <li><?php echo e($error); ?></li>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
                     </ul>
                 </div>
-            <?php endif; ?>
+            @endif
 
-            <form action="<?php echo e(route('employee.products.store')); ?>" method="POST">
-                <?php echo csrf_field(); ?>
+            <form action="{{ route('admin.products.update', $product->id) }}" method="POST">
+                @csrf
+                @method('PUT')
 
                 <div class="form-group">
                     <label for="name">Product Name *</label>
@@ -207,58 +207,36 @@
                            name="name" 
                            id="name" 
                            placeholder="Enter product name"
-                           value="<?php echo e(old('name')); ?>"
+                           value="{{ old('name', $product->name) }}"
                            required>
-                    <?php $__errorArgs = ['name'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                        <div class="error"><?php echo e($message); ?></div>
-                    <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
+                    @error('name')
+                        <div class="error">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="form-group">
                     <label for="description">Description</label>
                     <textarea name="description" 
                               id="description" 
-                              placeholder="Enter product description"><?php echo e(old('description')); ?></textarea>
-                    <?php $__errorArgs = ['description'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                        <div class="error"><?php echo e($message); ?></div>
-                    <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
+                              placeholder="Enter product description">{{ old('description', $product->description) }}</textarea>
+                    @error('description')
+                        <div class="error">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="form-group">
                     <label for="category_id">Category</label>
                     <select name="category_id" id="category_id">
                         <option value="">Select a category (optional)</option>
-                        <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($category->id); ?>" <?php echo e(old('category_id') == $category->id ? 'selected' : ''); ?>>
-                                <?php echo e($category->name); ?>
-
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
                             </option>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        @endforeach
                     </select>
-                    <?php $__errorArgs = ['category_id'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                        <div class="error"><?php echo e($message); ?></div>
-                    <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
+                    @error('category_id')
+                        <div class="error">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="form-group">
@@ -269,18 +247,11 @@ unset($__errorArgs, $__bag); ?>
                            step="0.01" 
                            min="0" 
                            placeholder="0.00"
-                           value="<?php echo e(old('price')); ?>"
+                           value="{{ old('price', $product->price) }}"
                            required>
-                    <?php $__errorArgs = ['price'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                        <div class="error"><?php echo e($message); ?></div>
-                    <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
+                    @error('price')
+                        <div class="error">{{ $message }}</div>
+                    @enderror
                     <div class="help-text">Enter price in dollars (e.g., 99.99)</div>
                 </div>
 
@@ -291,18 +262,11 @@ unset($__errorArgs, $__bag); ?>
                            id="stock" 
                            min="0" 
                            placeholder="0"
-                           value="<?php echo e(old('stock', 0)); ?>"
+                           value="{{ old('stock', $product->stock) }}"
                            required>
-                    <?php $__errorArgs = ['stock'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                        <div class="error"><?php echo e($message); ?></div>
-                    <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
+                    @error('stock')
+                        <div class="error">{{ $message }}</div>
+                    @enderror
                     <div class="help-text">Number of items available in stock</div>
                 </div>
 
@@ -312,17 +276,10 @@ unset($__errorArgs, $__bag); ?>
                            name="sku" 
                            id="sku" 
                            placeholder="Enter SKU (optional)"
-                           value="<?php echo e(old('sku')); ?>">
-                    <?php $__errorArgs = ['sku'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                        <div class="error"><?php echo e($message); ?></div>
-                    <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
+                           value="{{ old('sku', $product->sku) }}">
+                    @error('sku')
+                        <div class="error">{{ $message }}</div>
+                    @enderror
                     <div class="help-text">Unique identifier for the product (optional)</div>
                 </div>
 
@@ -331,15 +288,15 @@ unset($__errorArgs, $__bag); ?>
                            name="is_active" 
                            id="is_active" 
                            value="1"
-                           <?php echo e(old('is_active', true) ? 'checked' : ''); ?>>
+                           {{ old('is_active', $product->is_active) ? 'checked' : '' }}>
                     <label for="is_active" style="margin: 0; font-weight: normal;">Product is active</label>
                 </div>
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-success">
-                        ➕ Create Product
+                        💾 Update Product
                     </button>
-                    <a href="<?php echo e(route('employee.products')); ?>" class="btn btn-secondary">
+                    <a href="{{ route('admin.products') }}" class="btn btn-secondary">
                         Cancel
                     </a>
                 </div>
@@ -349,4 +306,5 @@ unset($__errorArgs, $__bag); ?>
 </body>
 </html>
 
-<?php /**PATH C:\xampp\htdocs\MidTerm230100575\resources\views/employee/products/create.blade.php ENDPATH**/ ?>
+
+

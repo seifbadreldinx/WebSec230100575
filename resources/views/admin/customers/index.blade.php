@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employees - Admin</title>
+    <title>Customers - Employee</title>
     <style>
         * {
             margin: 0;
@@ -16,7 +16,7 @@
             padding: 20px;
         }
         .navbar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 30px;
@@ -91,30 +91,19 @@
             display: inline-block;
         }
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
         }
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
         }
-        .btn-edit {
-            background: #007bff;
+        .btn-success {
+            background: #28a745;
             color: white;
-            padding: 6px 12px;
-            font-size: 0.9rem;
         }
-        .btn-edit:hover {
-            background: #0056b3;
-        }
-        .btn-delete {
-            background: #dc3545;
-            color: white;
-            padding: 6px 12px;
-            font-size: 0.9rem;
-        }
-        .btn-delete:hover {
-            background: #c82333;
+        .btn-success:hover {
+            background: #218838;
         }
         .table-container {
             background: white;
@@ -142,9 +131,10 @@
         tbody tr:hover {
             background: #f8f9fa;
         }
-        .actions {
-            display: flex;
-            gap: 8px;
+        .credit-amount {
+            font-weight: bold;
+            color: #28a745;
+            font-size: 1.1rem;
         }
         .pagination {
             margin-top: 20px;
@@ -154,13 +144,13 @@
         }
         .pagination a, .pagination span {
             padding: 8px 15px;
-            border: 1px solid #667eea;
+            border: 1px solid #28a745;
             border-radius: 5px;
             text-decoration: none;
-            color: #667eea;
+            color: #28a745;
         }
         .pagination .active {
-            background: #667eea;
+            background: #28a745;
             color: white;
         }
     </style>
@@ -168,18 +158,17 @@
 <body>
     <div class="navbar">
         <div>
-            <h1>👨‍💼 Admin Dashboard</h1>
+            <h1>👔 Employee Dashboard</h1>
         </div>
         <div class="navbar-links">
             <div class="user-info">
-                👤 <?php echo e(auth()->user()->name); ?>
-
+                👤 {{ auth()->user()->name }}
             </div>
-            <a href="<?php echo e(route('admin.dashboard')); ?>">Dashboard</a>
-            <a href="<?php echo e(route('admin.employees')); ?>">Employees</a>
-            <a href="<?php echo e(route('admin.users')); ?>">Users</a>
-            <form action="<?php echo e(route('logout')); ?>" method="POST">
-                <?php echo csrf_field(); ?>
+            <a href="{{ route('admin.dashboard') }}">Dashboard</a>
+            <a href="{{ route('admin.customers') }}">Customers</a>
+            <a href="{{ route('admin.products') }}">Products</a>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
                 <button type="submit">Logout</button>
             </form>
         </div>
@@ -187,68 +176,61 @@
 
     <div class="container">
         <div class="header">
-            <h2>👥 Employee Management</h2>
-            <a href="<?php echo e(route('admin.employees.create')); ?>" class="btn btn-primary">➕ Add Employee</a>
+            <h2>👥 Customer List</h2>
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-primary">← Back to Dashboard</a>
         </div>
 
-        <?php if(session('success')): ?>
+        @if(session('success'))
             <div class="alert alert-success">
-                ✅ <?php echo e(session('success')); ?>
-
+                ✅ {{ session('success') }}
             </div>
-        <?php endif; ?>
+        @endif
 
-        <?php if(session('error')): ?>
+        @if(session('error'))
             <div class="alert alert-danger">
-                ❌ <?php echo e(session('error')); ?>
-
+                ❌ {{ session('error') }}
             </div>
-        <?php endif; ?>
+        @endif
 
         <div class="table-container">
-            <?php if($employees->count() > 0): ?>
+            @if($customers->count() > 0)
                 <table>
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Name</th>
                             <th>Email</th>
-                            <th>Created At</th>
+                            <th>Credit</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php $__currentLoopData = $employees; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $employee): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        @foreach($customers as $customer)
                             <tr>
-                                <td>#<?php echo e($employee->id); ?></td>
-                                <td><?php echo e($employee->name); ?></td>
-                                <td><?php echo e($employee->email); ?></td>
-                                <td><?php echo e($employee->created_at->format('Y-m-d')); ?></td>
+                                <td>#{{ $customer->id }}</td>
+                                <td>{{ $customer->name }}</td>
+                                <td>{{ $customer->email }}</td>
+                                <td class="credit-amount">${{ number_format($customer->credit, 2) }}</td>
                                 <td>
-                                    <div class="actions">
-                                        <a href="<?php echo e(route('admin.employees.edit', $employee->id)); ?>" class="btn btn-edit">✏️ Edit</a>
-                                        <form action="<?php echo e(route('admin.employees.destroy', $employee->id)); ?>" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this employee?');">
-                                            <?php echo csrf_field(); ?>
-                                            <?php echo method_field('DELETE'); ?>
-                                            <button type="submit" class="btn btn-delete">🗑️ Delete</button>
-                                        </form>
-                                    </div>
+                                    <a href="{{ route('admin.customers.charge-credit', $customer->id) }}" class="btn btn-success">
+                                        💳 Charge Credit
+                                    </a>
                                 </td>
                             </tr>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        @endforeach
                     </tbody>
                 </table>
 
                 <div class="pagination">
-                    <?php echo e($employees->links()); ?>
-
+                    {{ $customers->links() }}
                 </div>
-            <?php else: ?>
-                <p style="text-align: center; padding: 40px; color: #666;">No employees found. <a href="<?php echo e(route('admin.employees.create')); ?>" style="color: #667eea;">Add one now</a></p>
-            <?php endif; ?>
+            @else
+                <p style="text-align: center; padding: 40px; color: #666;">No customers found.</p>
+            @endif
         </div>
     </div>
 </body>
 </html>
 
-<?php /**PATH C:\xampp\htdocs\MidTerm230100575\resources\views/admin/employees/index.blade.php ENDPATH**/ ?>
+
+

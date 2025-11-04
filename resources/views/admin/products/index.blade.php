@@ -224,14 +224,13 @@
         </div>
         <div class="navbar-links">
             <div class="user-info">
-                👤 <?php echo e(auth()->user()->name); ?>
-
+                👤 {{ auth()->user()->name }}
             </div>
-            <a href="<?php echo e(route('employee.dashboard')); ?>">Dashboard</a>
-            <a href="<?php echo e(route('employee.customers')); ?>">Customers</a>
-            <a href="<?php echo e(route('employee.products')); ?>">Products</a>
-            <form action="<?php echo e(route('logout')); ?>" method="POST">
-                <?php echo csrf_field(); ?>
+            <a href="{{ route('admin.dashboard') }}">Dashboard</a>
+            <a href="{{ route('admin.customers') }}">Customers</a>
+            <a href="{{ route('admin.products') }}">Products</a>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
                 <button type="submit">Logout</button>
             </form>
         </div>
@@ -241,27 +240,25 @@
         <div class="header">
             <h2>📦 Product Management</h2>
             <div>
-                <a href="<?php echo e(route('employee.dashboard')); ?>" class="btn btn-secondary" style="background: #6c757d; margin-right: 10px;">← Back</a>
-                <a href="<?php echo e(route('employee.products.create')); ?>" class="btn btn-primary">➕ Add New Product</a>
+                <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary" style="background: #6c757d; margin-right: 10px;">← Back</a>
+                <a href="{{ route('admin.products.create') }}" class="btn btn-primary">➕ Add New Product</a>
             </div>
         </div>
 
-        <?php if(session('success')): ?>
+        @if(session('success'))
             <div class="alert alert-success">
-                ✅ <?php echo e(session('success')); ?>
-
+                ✅ {{ session('success') }}
             </div>
-        <?php endif; ?>
+        @endif
 
-        <?php if(session('error')): ?>
+        @if(session('error'))
             <div class="alert alert-danger">
-                ❌ <?php echo e(session('error')); ?>
-
+                ❌ {{ session('error') }}
             </div>
-        <?php endif; ?>
+        @endif
 
         <div class="table-container">
-            <?php if($products->count() > 0): ?>
+            @if($products->count() > 0)
                 <table>
                     <thead>
                         <tr>
@@ -276,57 +273,56 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        @foreach($products as $product)
                             <tr>
-                                <td>#<?php echo e($product->id); ?></td>
-                                <td><strong><?php echo e($product->name); ?></strong></td>
-                                <td><?php echo e($product->category ? $product->category->name : 'N/A'); ?></td>
-                                <td>$<?php echo e(number_format($product->price, 2)); ?></td>
+                                <td>#{{ $product->id }}</td>
+                                <td><strong>{{ $product->name }}</strong></td>
+                                <td>{{ $product->category ? $product->category->name : 'N/A' }}</td>
+                                <td>${{ number_format($product->price, 2) }}</td>
                                 <td>
                                     <span class="stock-badge 
-                                        <?php if($product->stock > 10): ?> stock-high
-                                        <?php elseif($product->stock > 0): ?> stock-low
-                                        <?php else: ?> stock-out <?php endif; ?>">
-                                        <?php echo e($product->stock); ?> units
+                                        @if($product->stock > 10) stock-high
+                                        @elseif($product->stock > 0) stock-low
+                                        @else stock-out @endif">
+                                        {{ $product->stock }} units
                                     </span>
-                                    <form action="<?php echo e(route('employee.products.update-stock', $product->id)); ?>" method="POST" class="stock-form" style="margin-left: 10px;">
-                                        <?php echo csrf_field(); ?>
-                                        <input type="number" name="stock" value="<?php echo e($product->stock); ?>" min="0" required>
+                                    <form action="{{ route('admin.products.update-stock', $product->id) }}" method="POST" class="stock-form" style="margin-left: 10px;">
+                                        @csrf
+                                        <input type="number" name="stock" value="{{ $product->stock }}" min="0" required>
                                         <button type="submit" class="btn btn-success" style="padding: 4px 8px; font-size: 0.85rem;">Update</button>
                                     </form>
                                 </td>
                                 <td>
-                                    <span class="status-badge <?php echo e($product->is_active ? 'status-active' : 'status-inactive'); ?>">
-                                        <?php echo e($product->is_active ? 'Active' : 'Inactive'); ?>
-
+                                    <span class="status-badge {{ $product->is_active ? 'status-active' : 'status-inactive' }}">
+                                        {{ $product->is_active ? 'Active' : 'Inactive' }}
                                     </span>
                                 </td>
-                                <td><?php echo e($product->sku ?? 'N/A'); ?></td>
+                                <td>{{ $product->sku ?? 'N/A' }}</td>
                                 <td>
                                     <div class="actions">
-                                        <a href="<?php echo e(route('employee.products.edit', $product->id)); ?>" class="btn btn-edit">✏️ Edit</a>
-                                        <form action="<?php echo e(route('employee.products.destroy', $product->id)); ?>" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this product?');">
-                                            <?php echo csrf_field(); ?>
-                                            <?php echo method_field('DELETE'); ?>
+                                        <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-edit">✏️ Edit</a>
+                                        <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                            @csrf
+                                            @method('DELETE')
                                             <button type="submit" class="btn btn-delete">🗑️ Delete</button>
                                         </form>
                                     </div>
                                 </td>
                             </tr>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        @endforeach
                     </tbody>
                 </table>
 
                 <div class="pagination">
-                    <?php echo e($products->links()); ?>
-
+                    {{ $products->links() }}
                 </div>
-            <?php else: ?>
-                <p style="text-align: center; padding: 40px; color: #666;">No products found. <a href="<?php echo e(route('employee.products.create')); ?>" style="color: #28a745;">Create one now</a></p>
-            <?php endif; ?>
+            @else
+                <p style="text-align: center; padding: 40px; color: #666;">No products found. <a href="{{ route('admin.products.create') }}" style="color: #28a745;">Create one now</a></p>
+            @endif
         </div>
     </div>
 </body>
 </html>
 
-<?php /**PATH C:\xampp\htdocs\MidTerm230100575\resources\views/employee/products/index.blade.php ENDPATH**/ ?>
+
+

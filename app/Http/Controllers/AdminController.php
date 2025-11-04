@@ -176,4 +176,155 @@ class AdminController extends Controller
         
         return view('admin.roles.index', compact('roles', 'roleUsers'));
     }
+
+    /**
+     * List all customers (same as Employee controller)
+     */
+    public function customers()
+    {
+        $customerRole = Role::where('name', 'Customer')->first();
+        $customers = User::where('role_id', $customerRole->id)
+            ->withCount('boughtProducts')
+            ->paginate(15);
+        
+        return view('admin.customers.index', compact('customers'));
+    }
+
+    /**
+     * Show charge credit form
+     */
+    public function showChargeCredit(User $user)
+    {
+        if (!$user->isCustomer()) {
+            return redirect()->route('admin.customers')
+                ->with('error', 'Can only charge credit for customers.');
+        }
+        
+        return view('admin.customers.charge-credit', compact('user'));
+    }
+
+    /**
+     * Charge customer credit
+     */
+    public function chargeCredit(Request $request, User $user)
+    {
+        if (!$user->isCustomer()) {
+            return redirect()->route('admin.customers')
+                ->with('error', 'Can only charge credit for customers.');
+        }
+        
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01|max:10000',
+        ]);
+        
+        $amount = $request->input('amount');
+        
+        if ($amount <= 0) {
+            return redirect()->back()
+                ->with('error', 'Amount must be positive.')
+                ->withInput();
+        }
+        
+        $user->credit += $amount;
+        $user->save();
+        
+        return redirect()->route('admin.customers')
+            ->with('success', "Successfully added $$amount credit to {$user->name}'s account.");
+    }
+
+    /**
+     * List all products for management
+     */
+    public function products()
+    {
+        $products = \App\Models\Product::with('category')->paginate(15);
+        return view('admin.products.index', compact('products'));
+    }
+
+    /**
+     * Show create product form
+     */
+    public function createProduct()
+    {
+        $categories = \App\Models\Category::all();
+        return view('admin.products.create', compact('categories'));
+    }
+
+    /**
+     * Store new product
+     */
+    public function storeProduct(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'category_id' => 'required|exists:categories,id',
+            'sku' => 'required|string|unique:products,sku',
+            'is_active' => 'boolean',
+        ]);
+        
+        \App\Models\Product::create($request->all());
+        
+        return redirect()->route('admin.products')
+            ->with('success', 'Product created successfully.');
+    }
+
+    /**
+     * Show edit product form
+     */
+    public function editProduct(\App\Models\Product $product)
+    {
+        $categories = \App\Models\Category::all();
+        return view('admin.products.edit', compact('product', 'categories'));
+    }
+
+    /**
+     * Update product
+     */
+    public function updateProduct(Request $request, \App\Models\Product $product)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'category_id' => 'required|exists:categories,id',
+            'sku' => 'required|string|unique:products,sku,' . $product->id,
+            'is_active' => 'boolean',
+        ]);
+        
+        $product->update($request->all());
+        
+        return redirect()->route('admin.products')
+            ->with('success', 'Product updated successfully.');
+    }
+
+    /**
+     * Delete product
+     */
+    public function deleteProduct(\App\Models\Product $product)
+    {
+        $product->delete();
+        
+        return redirect()->route('admin.products')
+            ->with('success', 'Product deleted successfully.');
+    }
+
+    /**
+     * Update stock only
+     */
+    public function updateStock(Request $request, \App\Models\Product $product)
+    {
+        $request->validate([
+            'stock' => 'required|integer|min:0',
+        ]);
+        
+        $product->stock = $request->input('stock');
+        $product->save();
+        
+        return redirect()->back()
+            ->with('success', 'Stock updated successfully.');
+    }
 }

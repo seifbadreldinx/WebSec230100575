@@ -154,9 +154,10 @@
             <div class="action-buttons">
                 <a href="{{ route('admin.employees.create') }}" class="action-btn">➕ Add Employee</a>
                 <a href="{{ route('admin.employees') }}" class="action-btn">👥 Manage Employees</a>
+                <a href="{{ route('admin.customers') }}" class="action-btn">� Manage Customers</a>
+                <a href="{{ route('admin.products') }}" class="action-btn">� Manage Products</a>
                 <a href="{{ route('admin.users') }}" class="action-btn">📋 View All Users</a>
-                <a href="{{ route('admin.roles') }}" class="action-btn">🔐 View Roles & Permissions</a>
-                <a href="{{ route('products.index') }}" class="action-btn">🛍️ View Products</a>
+                <a href="{{ route('admin.roles') }}" class="action-btn">� View Roles & Permissions</a>
             </div>
         </div>
     </div>

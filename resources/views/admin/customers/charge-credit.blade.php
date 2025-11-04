@@ -170,14 +170,13 @@
         </div>
         <div class="navbar-links">
             <div class="user-info">
-                👤 <?php echo e(auth()->user()->name); ?>
-
+                👤 {{ auth()->user()->name }}
             </div>
-            <a href="<?php echo e(route('employee.dashboard')); ?>">Dashboard</a>
-            <a href="<?php echo e(route('employee.customers')); ?>">Customers</a>
-            <a href="<?php echo e(route('employee.products')); ?>">Products</a>
-            <form action="<?php echo e(route('logout')); ?>" method="POST">
-                <?php echo csrf_field(); ?>
+            <a href="{{ route('admin.dashboard') }}">Dashboard</a>
+            <a href="{{ route('admin.customers') }}">Customers</a>
+            <a href="{{ route('admin.products') }}">Products</a>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
                 <button type="submit">Logout</button>
             </form>
         </div>
@@ -187,27 +186,27 @@
         <div class="form-container">
             <div class="form-header">
                 <h2>💳 Charge Customer Credit</h2>
-                <a href="<?php echo e(route('employee.customers')); ?>" style="color: #28a745; text-decoration: none;">← Back to Customers</a>
+                <a href="{{ route('admin.customers') }}" style="color: #28a745; text-decoration: none;">← Back to Customers</a>
             </div>
 
             <div class="customer-info">
-                <p><strong>Customer Name:</strong> <?php echo e($customer->name); ?></p>
-                <p><strong>Email:</strong> <?php echo e($customer->email); ?></p>
-                <p><strong>Current Credit:</strong> <span style="color: #28a745; font-weight: bold; font-size: 1.2rem;">$<?php echo e(number_format($customer->credit, 2)); ?></span></p>
+                <p><strong>Customer Name:</strong> {{ $customer->name }}</p>
+                <p><strong>Email:</strong> {{ $customer->email }}</p>
+                <p><strong>Current Credit:</strong> <span style="color: #28a745; font-weight: bold; font-size: 1.2rem;">${{ number_format($customer->credit, 2) }}</span></p>
             </div>
 
-            <?php if($errors->any()): ?>
+            @if($errors->any())
                 <div class="alert alert-danger">
                     <ul style="margin-left: 20px;">
-                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <li><?php echo e($error); ?></li>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
                     </ul>
                 </div>
-            <?php endif; ?>
+            @endif
 
-            <form action="<?php echo e(route('employee.customers.charge-credit.store', $customer->id)); ?>" method="POST">
-                <?php echo csrf_field(); ?>
+            <form action="{{ route('admin.customers.charge-credit.store', $customer->id) }}" method="POST">
+                @csrf
 
                 <div class="form-group">
                     <label for="amount">Amount to Charge *</label>
@@ -217,18 +216,11 @@
                            step="0.01" 
                            min="0.01" 
                            placeholder="Enter amount (e.g., 100.00)"
-                           value="<?php echo e(old('amount')); ?>"
+                           value="{{ old('amount') }}"
                            required>
-                    <?php $__errorArgs = ['amount'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                        <div class="error"><?php echo e($message); ?></div>
-                    <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
+                    @error('amount')
+                        <div class="error">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="note">
@@ -240,7 +232,7 @@ unset($__errorArgs, $__bag); ?>
                     <button type="submit" class="btn btn-success">
                         💳 Charge Credit
                     </button>
-                    <a href="<?php echo e(route('employee.customers')); ?>" class="btn btn-secondary">
+                    <a href="{{ route('admin.customers') }}" class="btn btn-secondary">
                         Cancel
                     </a>
                 </div>
@@ -250,4 +242,5 @@ unset($__errorArgs, $__bag); ?>
 </body>
 </html>
 
-<?php /**PATH C:\xampp\htdocs\MidTerm230100575\resources\views/employee/customers/charge-credit.blade.php ENDPATH**/ ?>
+
+

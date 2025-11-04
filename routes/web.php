@@ -98,6 +98,20 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     
     // Roles Management
     Route::get('/roles', [AdminController::class, 'roles'])->name('roles');
+    
+    // Customer Management
+    Route::get('/customers', [AdminController::class, 'customers'])->name('customers');
+    Route::get('/customers/{user}/charge', [AdminController::class, 'showChargeCredit'])->name('customers.charge');
+    Route::post('/customers/{user}/charge', [AdminController::class, 'chargeCredit'])->name('customers.charge.post');
+    
+    // Product Management
+    Route::get('/products', [AdminController::class, 'products'])->name('products');
+    Route::get('/products/create', [AdminController::class, 'createProduct'])->name('products.create');
+    Route::post('/products', [AdminController::class, 'storeProduct'])->name('products.store');
+    Route::get('/products/{product}/edit', [AdminController::class, 'editProduct'])->name('products.edit');
+    Route::put('/products/{product}', [AdminController::class, 'updateProduct'])->name('products.update');
+    Route::delete('/products/{product}', [AdminController::class, 'deleteProduct'])->name('products.delete');
+    Route::post('/products/{product}/stock', [AdminController::class, 'updateStock'])->name('products.stock');
 });
 
 // Employee Routes
