@@ -71,14 +71,15 @@ Route::get('/dashboard', function () {
 // Product Routes
 Route::middleware('auth')->group(function () {
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-    Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
     
     // Customer product purchase routes
     Route::middleware('role:Customer')->group(function () {
-        Route::post('/products/{product}/buy', [ProductController::class, 'buy'])->name('products.buy');
         Route::get('/products/insufficient-credit', [ProductController::class, 'insufficientCredit'])->name('products.insufficient-credit');
         Route::get('/my-purchases', [ProductController::class, 'myPurchases'])->name('products.my-purchases');
+        Route::post('/products/{product}/buy', [ProductController::class, 'buy'])->name('products.buy');
     });
+    
+    Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 });
 
 // Admin Routes
