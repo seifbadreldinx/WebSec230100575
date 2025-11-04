@@ -159,4 +159,21 @@ class AdminController extends Controller
         $users = User::with('role')->paginate(15);
         return view('admin.users.index', compact('users'));
     }
+
+    /**
+     * Display all roles and their permissions.
+     */
+    public function roles()
+    {
+        $roles = Role::withCount('users')->get();
+        $roleUsers = [];
+        
+        foreach ($roles as $role) {
+            $roleUsers[$role->name] = User::where('role_id', $role->id)
+                ->select('id', 'name', 'email')
+                ->get();
+        }
+        
+        return view('admin.roles.index', compact('roles', 'roleUsers'));
+    }
 }

@@ -95,6 +95,9 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     
     // User Management
     Route::get('/users', [AdminController::class, 'users'])->name('users');
+    
+    // Roles Management
+    Route::get('/roles', [AdminController::class, 'roles'])->name('roles');
 });
 
 // Employee Routes
