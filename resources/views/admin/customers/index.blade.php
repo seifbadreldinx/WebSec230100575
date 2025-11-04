@@ -212,7 +212,7 @@
                                 <td>{{ $customer->email }}</td>
                                 <td class="credit-amount">${{ number_format($customer->credit, 2) }}</td>
                                 <td>
-                                    <a href="{{ route('admin.customers.charge-credit', $customer->id) }}" class="btn btn-success">
+                                    <a href="{{ route('admin.customers.charge', $customer->id) }}" class="btn btn-success">
                                         💳 Charge Credit
                                     </a>
                                 </td>

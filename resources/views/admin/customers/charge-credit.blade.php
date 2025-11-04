@@ -205,7 +205,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('admin.customers.charge-credit.store', $customer->id) }}" method="POST">
+            <form action="{{ route('admin.customers.charge.post', $customer->id) }}" method="POST">
                 @csrf
 
                 <div class="form-group">
@@ -241,6 +241,7 @@
     </div>
 </body>
 </html>
+
 
 
 
