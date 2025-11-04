@@ -286,7 +286,7 @@
                                         @else stock-out @endif">
                                         {{ $product->stock }} units
                                     </span>
-                                    <form action="{{ route('admin.products.update-stock', $product->id) }}" method="POST" class="stock-form" style="margin-left: 10px;">
+                                    <form action="{{ route('admin.products.stock', $product->id) }}" method="POST" class="stock-form" style="margin-left: 10px;">
                                         @csrf
                                         <input type="number" name="stock" value="{{ $product->stock }}" min="0" required>
                                         <button type="submit" class="btn btn-success" style="padding: 4px 8px; font-size: 0.85rem;">Update</button>
@@ -301,7 +301,7 @@
                                 <td>
                                     <div class="actions">
                                         <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-edit">✏️ Edit</a>
-                                        <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                        <form action="{{ route('admin.products.delete', $product->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this product?');">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-delete">🗑️ Delete</button>
@@ -323,6 +323,8 @@
     </div>
 </body>
 </html>
+
+
 
 
 
